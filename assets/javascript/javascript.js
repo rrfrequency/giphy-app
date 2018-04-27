@@ -23,31 +23,50 @@ function createButton(){
 };
 
 // image creator
-// function makeImage(){
-//   $.ajax({
-//           url: queryURL,
-//           method: "GET"
-//         })
-//     .done(function(response) {
-//         let results = response.data;
-//         // console.log(results);
+function makeImage(){
+  $(".imageArea").empty();
+   $.ajax({
+          url: queryURL,
+          method: "GET"
+        })
+    .done((response) => {
+        let results = response.data;
+        console.log(results);
+ 
         
-//         for (let i = 0; i < results.length; i++) {
-//             if (results[i].rating !== "r" && results[i].rating !== "pg-13") {
-//               let rating = results[i].rating;
-//               let p = $("<p>").text("Rating: " + rating);
-//               let image = $("<img class='resultGif'>");
-
-//               image.attr("src", results[i].images.fixed_height.url);
-//               $("#imageHolder").append(image);
-//             }
-//         }
-//      });
-// };
+        for (let i = 0; i < results.length; i++) {
+            if (results[i].rating !== "r" && results[i].rating !== "pg-13") {
+              let rating = results[i].rating;
+              let p = $("<p>").text("Rating: " + rating);
+              let image = $("<img class='resultGif'>");
+              let image = $("<img class='resultGif' src='' data-still='" + results[i].images.fixed_height_still.url + "' data-animate='" + results[i].images.fixed_height.url + "'data-state='still'>");
+       
+              let position = i + 3;
+              if (position % 3 === 0){
+                image.attr("src", results[i].images.fixed_height_still.url);
+              $("#imageHolderOne").append(image);
+              $("#imageHolderOne").append(p);
+              }
+              if (position % 3 === 1){
+                image.attr("src", results[i].images.fixed_height_still.url);
+              $("#imageHolderTwo").append(image);
+              $("#imageHolderTwo").append(p);
+              }
+              if (position % 3 === 2){
+                image.attr("src", results[i].images.fixed_height_still.url);
+              $("#imageHolderThree").append(image);
+              $("#imageHolderThree").append(p);
+              }
+            }
+        }
+        animation();
+     });
+    button();
+};
 
 $("#buttonHolder").empty();
 createButton();
-
+button();
 
 $("#addSearch").on("click", (event) => {
   event.preventDefault();
@@ -55,38 +74,34 @@ $("#addSearch").on("click", (event) => {
   console.log(search);
   topics.push(search);
   createButton();
-
-  let queryURL = "https://api.giphy.com/v1/gifs/search?q=" + search + "&api_key=jjTXT5JPSNvj6EpFihaGkQ5ZfeCK1kgm&limit=10";
+  queryURL = "https://api.giphy.com/v1/gifs/search?q=" + search + "&api_key=" + apiKey;
   makeImage();
+  $("#searchInput").val("");
 });
 
 
 // Create Images
 $(".button").on("click", function(){
-  $("#imageHolder").empty();
+  // $("#imageHolder").empty();
 
-  search=$(this).html();
+    search = $(this).html();
 
   // makeImage();
-  let queryURL="https://api.giphy.com/v1/gifs/search?q=" + search + "&api_key=jjTXT5JPSNvj6EpFihaGkQ5ZfeCK1kgm&limit=10";
-    $.ajax({
-          url: queryURL,
-          method: "GET"
-        })
-    .done((response) => {
-        var results = response.data;
-        // console.log(results);
-        
-        for (let i = 0; i < results.length; i++) {
-            if (results[i].rating !== "r" && results[i].rating !== "pg-13") {
-              let rating = results[i].rating;
-              let p = $("<p>").text("Rating: " + rating);
-              let image = $("<img class='resultGif'>");
-
-              image.attr("src", results[i].images.fixed_height.url);
-              $("#imageHolder").append(image);
-            }
-        }
-     });
+    queryURL = "https://api.giphy.com/v1/gifs/search?q=" + search + "&api_key=" + apiKey;
+    makeImage();
 
 });
+
+function animation(){
+  $(".resultGif").on("click", function() {
+  console.log(this);
+    let state = $(this).attr("data-state");
+    if (state === "still") {
+      $(this).attr("src", $(this).attr("data-animate"));
+      $(this).attr("data-state", "animate");
+    } else {
+        $(this).attr("src", $(this).attr("data-still"));
+        $(this).attr("data-state", "still");
+      }
+    });
+};
